@@ -22,14 +22,18 @@
             <div class="need_money" v-show="need_money>=0">{{need_money}}</div>
             </transition>
             <!-- 开挂状态 -->
+            <div class="infinate_refresh" @click="infinateRefresh">免费刷新</div>
             <div class="open_hook" @click="addMyMoney">金币+100</div>
+
+            <!-- 冷冻随按钮 -->
+            <div class="freeze" @click="freezeMinions"></div>
       </div>
       <!-- 随从区块 -->
       <div class="combat_area">
           <!-- 鲍勃的随从 -->
           <div class="bob_retinues">
               <ul>
-                  <li v-for="(r,index) in 7" :key="r.index">
+                  <li v-for="(r,index) in 7" :key="r.index" ref="bob_minions">
                       <img :src="bob_minions[index].img" alt="" ref="bob_minions_image" @click="select(index)">
                       <div class="level">{{bob_minions[index].level}}</div>
                       <div class="nickname">{{bob_minions[index].name}}</div>
@@ -69,7 +73,11 @@
       <!-- 我的面板 -->
       <div class="mine">
           <div class="my_hero">
-              <button class="chose_one">选择英雄</button>
+              <img :src="myHero.img" alt="">
+              <button class="chose_one" @click="status.choseHero = true" v-show="myHero.name == '' ">选择英雄</button>
+          </div>
+          <div class="my_hero_skill">
+              <img :src="myHero.skillImg" alt="">
           </div>
           <div class="my_hand" ref="hands">
               <ul>
@@ -132,16 +140,42 @@
               </ul>
           </div>
       </div>
+
+      <!-- 英雄选择面板 -->
+        
+        <div class="choseHeroPanel" v-show="status.choseHero">
+            <transition name="animate__animated animate__bounce" enter-active-class="animate__backInDown">
+            <div class="box" v-show="status.choseHero">
+                <ul>
+                    <li v-for="(h,index) in this.heros" :key="h.index" @click="choseMyHero(index)">
+                        <img :src="h.img" alt="">
+                        <div class="name">{{h.name}}</div>
+                        <div class="health">{{h.health}}</div>
+                        <div class="detailMsg">
+                            <div class="content">
+                                {{h.detail}}
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="close" @click="status.choseHero = false"></div>
+            </div>
+           </transition>
+        </div>
+
+      <!-- 保存我的阵容面板 -->
+
   </div>
 </template>
 
 <script>
 import minionsData from '../mixin/minion_data'
 import commonFunction from '../mixin/common_function'
+import heroData from '../mixin/hero_data.js'
 import 'animate.css'
 export default {
     name : 'MainPanel',
-    mixins:[minionsData,commonFunction],
+    mixins:[minionsData,commonFunction,heroData],
     data(){
         return{
             bob_minions : [
@@ -353,7 +387,9 @@ export default {
             status:{
                 put : false, //放置状态
                 exchange : false, //交换状态
-                hook : false
+                hook : false,
+                choseHero : false,
+                freeze : false, // 冷冻
             },
             //指定位置放入随从的index
             putIndex : 0,
@@ -403,14 +439,31 @@ export default {
                         img:require('../assets/card.jpg'),
                     }
                 ]
+            },
+            //我的英雄
+            myHero:{
+                name : '',
+                img : '',
+                skillImg : '',
+                detail : ''
             }
         }
     },
     methods:{
         //刷新酒馆
         refresh(){
+            //刷新解冻，并恢复刷新随从
+            if(this.status.freeze){
+                for(let i=0;i<this.bob_minions.length;i++){
+                    if(this.bob_minions[i].name != ""){
+                        this.$refs.bob_minions[i].classList.remove('active')
+                    }
+                }
+                this.status.freeze = false
+            }
             if(this.my.money >= 1){
                 this.my.money -= 1;
+                
                 if(this.tavernLevel == 1){
                     for(let i=0;i<3;i++){
                         this.replace.call(this,i,this.allMinions.oneLevels)
@@ -438,6 +491,43 @@ export default {
                 }
             }else{
                 return;
+            }
+        },
+        //无限刷新
+        infinateRefresh(){
+            //刷新解冻，并恢复刷新随从
+            if(this.status.freeze){
+                for(let i=0;i<this.bob_minions.length;i++){
+                    if(this.bob_minions[i].name != ""){
+                        this.$refs.bob_minions[i].classList.remove('active')
+                    }
+                }
+                this.status.freeze = false
+            }
+            if(this.tavernLevel == 1){
+                for(let i=0;i<3;i++){
+                    this.replace.call(this,i,this.allMinions.oneLevels)
+                }
+            }else if(this.tavernLevel == 2){
+                for(let i=0;i<4;i++){
+                    this.replace.call(this,i,this.tavern_minions.two)
+                }
+            }else if(this.tavernLevel == 3){
+                for(let i=0;i<4;i++){
+                    this.replace.call(this,i,this.tavern_minions.three)
+                }
+            }else if(this.tavernLevel == 4){
+                for(let i=0;i<5;i++){
+                    this.replace.call(this,i,this.tavern_minions.four)
+                }
+            }else if(this.tavernLevel == 5){
+                for(let i=0;i<5;i++){
+                    this.replace.call(this,i,this.tavern_minions.fif)
+                }
+            }else{
+                for(let i=0;i<6;i++){
+                    this.replace.call(this,i,this.tavern_minions.six)
+                }
             }
         },
         //选择打开购买随从面板
@@ -487,7 +577,16 @@ export default {
         nextTurn(){
             this.all_turns += 1;
             this.my.money += 1;
-            this.refresh();
+            if(this.status.freeze){
+                for(let i=0;i<this.bob_minions.length;i++){
+                        if(this.bob_minions[i].name != ''){
+                            this.$refs.bob_minions[i].classList.remove('active')
+                        }
+                }
+                this.status.freeze = false
+            }else{
+                this.refresh();
+            }
             this.my.money = 2 + this.all_turns   
             if(this.need_money>=1){
                 this.need_money -= 1;
@@ -735,6 +834,32 @@ export default {
             this.my.hand[this.my.hand.length-1].ad = this.combo.combo_minions[id].attack
             this.my.hand[this.my.hand.length-1].hp = this.combo.combo_minions[id].health
             this.combo.status = false
+        },
+        freezeMinions(){
+            if(this.status.freeze){
+                for(let i=0;i<this.bob_minions.length;i++){
+                        if(this.bob_minions[i].name != ''){
+                            this.$refs.bob_minions[i].classList.remove('active')
+                        }
+                }
+                this.status.freeze = false
+            }else{
+                for(let i=0;i<this.bob_minions.length;i++){
+                        if(this.bob_minions[i].name != ''){
+                            this.$refs.bob_minions[i].classList.add('active')
+                        }
+                }
+                this.status.freeze = true           
+            }
+        },
+        //选择一个我的英雄
+        choseMyHero(id){
+            this.myHero.img = this.heros[id].img
+            this.myHero.name = this.heros[id].name
+            this.myHero.detail = this.heros[id].detail
+
+            //关闭选择英雄面板
+            this.status.choseHero = false
         }
     },
     watch:{

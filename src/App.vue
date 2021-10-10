@@ -54,6 +54,22 @@ export default {
         width: 1200px;
         height: 120px;
         margin: 0 0 0 -600px;
+        .freeze{
+            position: absolute; right: 160px; top: 10px;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            color: rgb(74, 204, 255);
+            background: rgb(0, 141, 197);
+            border: 5px solid rgb(74, 204, 255);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .freeze:hover{
+            transform: scale(1.1);
+        }
         .bob_head{
             position: absolute; top: 0px; left: 50%;
             width: 120px;
@@ -160,12 +176,12 @@ export default {
             color: white;
         }
         //开挂
-        .open_hook{
-            position : absolute;right : 0;top:50%;
+        .open_hook,.infinate_refresh{
+            position : absolute;right : 0;top:65%;
             width : 120px;
-            height: 40px;
+            height: 35px;
             text-align: center;
-            line-height: 40px;
+            line-height: 35px;
             border-radius: 8px;
             border: 4px solid @border;
             background : @shit;
@@ -173,7 +189,10 @@ export default {
             margin : -20px 0 0 0;
             transition : all .2s;
         }
-        .open_hook:hover{
+        .infinate_refresh{
+            top : 25%;
+        }
+        .open_hook:hover,.infinate_refresh:hover{
             opacity: 0.8;
         }
     }
@@ -308,6 +327,12 @@ export default {
                     opacity: 0.9;
                 }
             }
+            ul{
+                li.active{
+                    border-color: skyblue;
+                    box-shadow: 0 0 20px skyblue;
+                }
+            }
         }
     }
     .all_turn,.next_turn{
@@ -347,6 +372,11 @@ export default {
             border-radius: 50%;
             border: 5px solid rgb(121, 84, 37);
             background: @shit;
+            img{
+                width: 100%;
+                height:100%;
+                border-radius:50%;
+            }
             .chose_one{
                 position: absolute; left: 50%; top : 50%;
                 margin: -15px 0 0 -40px;
@@ -365,6 +395,19 @@ export default {
             .chose_one:hover{
                 transform: scale(1.1);
                 background: rgb(255, 223, 135);
+            }
+        }
+        .my_hero_skill{
+            position : absolute;left:50%;top:60px;
+            width: 50px;
+            height:50px;
+            border:8px solid @darkshit;
+            margin:0 0 0 -150px;
+            border-radius: 50%;
+            img{
+                width:100%;
+                height : 100%;
+                border-radius:50%;
             }
         }
         .my_hand{
@@ -690,6 +733,104 @@ export default {
                 li:hover{
                     border-color:white
                     
+                }
+            }
+        }
+    }
+
+    //英雄选择面板
+    .choseHeroPanel{
+        position: absolute; top:0;left:0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        .box{
+            position: absolute; left: 50%; top : 50%;
+            margin: -250px 0 0 -500px;
+            width: 1000px;
+            height: 500px;
+            background: @shit;
+            border-radius: 20px;
+            border: 6px solid @border;
+            .close{
+                position:absolute;right: 5px; top: 5px;
+                width: 30px;
+                height: 30px;
+                font-size: 25px;
+                text-align: center;
+                line-height: 30px;
+                color: rgb(255, 0, 0);
+                transition: all .2s;
+                cursor: pointer;
+            }
+            .close:hover{
+                transform: rotate(90deg);
+            }
+            ul{
+                position: absolute; left: 50%; top : 50%;
+                transform : translate(-50%,-50%);
+                width: 900px;
+                height: 450px;
+                li{
+                    position : relative;
+                    float: left;
+                    width: 90px;
+                    height: 90px;
+                    font-size: 12px;
+                    margin: 20px 0 0 20px;
+                    border: 10px solid @darkshit;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: all .2s;
+                    box-shadow: 0 0 5px black;
+                    img{
+                        width:100%;
+                        height : 100%;
+                        // border-radius:10px;
+                    }
+                    .name{
+                        position: absolute; left:0;bottom:-10px;
+                        width: 90px;
+                        height: 30px;
+                        text-align: left;
+                        line-height: 30px;
+                        color:white;
+                    }
+                    .health{
+                        position:absolute;right: -25px; bottom: -15px;
+                        width: 30px;
+                        height: 30px;
+                        border:5px solid darkred;
+                        background: red;
+                        color:white;
+                        text-align: center;
+                        line-height: 25px;
+                        border-radius: 50%;
+                    }
+                    .detailMsg{
+                        display: none;
+                        position:absolute;left:-100px;top:20px;
+                        width: 120px;
+                        height: 160px;
+                        border-radius: 15px 0 15px 15px;
+                        background: rgb(156, 83, 0);
+                        border:3px solid rgb(90, 48, 0);
+                        color:white;
+                        z-index:1;
+                        .content{
+                            position: absolute; left: 50%; top : 50%;
+                            transform : translate(-50%,-50%);
+                            width: 100px;
+                            height: 140px;
+                        }
+                    }
+                }
+                li:hover{
+                    transform: translateY(-5px);
+                    box-shadow: 5px 5px 20px black;
+                }
+                li:hover .detailMsg{
+                    display : block;
                 }
             }
         }

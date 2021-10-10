@@ -631,6 +631,31 @@ let minionData = {
                     },
                     img:require('../assets/随从头像/中立/无私的英雄.jpg')
                 },
+                //3.驯兽师
+                {
+                    level : 3,
+                    name : '驯兽师',
+                    type : '中立',
+                    attack : 4,
+                    health : 3,
+                    skill : {
+                        type : 'battleCry_single',
+                        battleCry_single(id,isGolden){
+                            if(isGolden){
+                                if(this.my_minions[id].type == '野兽'){
+                                    this.my_minions[id].ad += 4;
+                                    this.my_minions[id].hp += 4;
+                                }
+                            }else{
+                                if(this.my_minions[id].type == '野兽'){
+                                    this.my_minions[id].ad += 2;
+                                    this.my_minions[id].hp += 2;
+                                }
+                            }
+                        }
+                    },
+                    img:require('../assets/随从头像/中立/驯兽师.jpg')
+                },
                 //4.管理者埃克索图斯
                 {
                     level : 4,
@@ -661,6 +686,21 @@ let minionData = {
                         }
                     },
                     img:require('../assets/随从头像/中立/管理者埃克索图斯.jpg')
+                },
+                //5.瑞文戴尔男爵
+                {
+                    level : 5,
+                    name : '瑞文戴尔男爵',
+                    type : '中立',
+                    attack : 1,
+                    health : 7,
+                    skill : {
+                        type : 'passive',
+                        passive(){
+                            
+                        }
+                    },
+                    img:require('../assets/随从头像/中立/瑞文戴尔男爵.jpg')
                 },
                 //6.扎普斯里维克
                 {
